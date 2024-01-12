@@ -6,7 +6,7 @@ const result = await Tour.create(userData);
 return result;
 }
 
-const getAllTour = async() : Promise<ITour[]> =>{
+const getAllTours = async() : Promise<ITour[]> =>{
     const result = await Tour.find({
         userStatus: 'active'
     })
@@ -15,7 +15,7 @@ const getAllTour = async() : Promise<ITour[]> =>{
 
 
 const getSingleTour = async (id:string) :  Promise<ITour | null> =>{
-const result = await Tour.findById(id);
+const result = await Tour.findById(id).populate('reviews');
 return result;
 }
 
@@ -35,7 +35,7 @@ const deleteTour = async (id: string): Promise<ITour | null> =>{
 
 export const tourServices ={
     createTour,
-   getAllTour,
+   getAllTours,
     getSingleTour,
    updateTour,
      deleteTour,

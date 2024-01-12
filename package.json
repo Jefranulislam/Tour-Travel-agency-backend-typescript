@@ -20,6 +20,7 @@
     "git": "^0.1.5",
     "joi": "^17.11.0",
     "mongoose": "^8.0.3",
+    "slugify": "^1.6.6",
     "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {

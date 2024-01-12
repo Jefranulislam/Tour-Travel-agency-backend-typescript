@@ -1,7 +1,8 @@
 import {  Schema, model } from "mongoose";
-import { Itour } from "../interfaces/tour.interface";
+import { ITModel, ITour, ITourMethods } from "../interfaces/tour.interface";
+import slugify from "slugify";
 
-const tourSchema = new Schema<Itour>({
+const tourSchema = new Schema<ITour,ITModel,ITourMethods>({
     name: {
         type: String,
         required: [true, "Please provide a name for the tour"],
@@ -52,8 +53,49 @@ const tourSchema = new Schema<Itour>({
       slug: {
         type: String,
       },
+} ,{
+  toJSON:{virtuals:true},
+  toObject:{virtuals:true}
+} )
+
+
+tourSchema.pre('save', function(next){
+  this.slug = slugify(this.name, {lower: true})
+  next()
 })
 
-const Tour = model<Itour>('Tour',tourSchema)
+tourSchema.virtual("durationDays").get(function () {
+  return this.durationHours/24
+})
+
+tourSchema.methods.getNextNearestDataAndEndDate = function() : {
+  nearestStartDate: Date | null
+  estimatedEndDate: Date | null
+}
+  {
+  const today = new Date()
+  const futureDates = this.stateDates.filter((startDate : Date)=>{
+    return startDate > today
+  } )
+
+
+  futureDates.sort((a: Date , b: Date)=> a.getTime()-b.getTime())
+const nearestStartDate = futureDates[0] 
+const estimatedEndDate = new Date( nearestStartDate.getTime()+ this.durationHours*60*60*1000)
+
+return {
+ nearestStartDate, estimatedEndDate
+}
+  
+}
+
+tourSchema.virtual("reviews",  { 
+  ref: "Review",
+  foreignField : 'tour',
+  localField: "_id"
+})
+
+
+const Tour = model<ITour>('Tour',tourSchema)
 
 export default Tour;

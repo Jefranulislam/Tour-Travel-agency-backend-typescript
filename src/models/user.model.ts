@@ -28,7 +28,7 @@ const userSchema = new Schema<Iuser>({
         enum: ['active','inactive']
     }
 })
-
+//query Middle ware to findout the pre hook 
 userSchema.pre(/^find/, function (this: Query<Iuser,Document>, next){
     this.find({
     userStatus : { $eq : "active"}
